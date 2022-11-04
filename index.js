@@ -14,7 +14,7 @@ app.post("/sign-up", (req, res) => {
     const {username, avatar} = req.body
 
     if(!username || !avatar){
-        res.status(409).send("Preencha todos os campos para prosseguir!");
+        res.status(400).send("Todos os campos são obrigatórios!");
         return;
     }
 
@@ -24,7 +24,25 @@ app.post("/sign-up", (req, res) => {
     }
 
     usuarios.push(usuario)
-    res.send("OK")
+    res.status(201).send("OK")
+});
+
+app.post("/tweets", (req, res) => {
+    const {username, tweet} = req.body;
+    if(!tweet || !username){
+        res.status(400).send("Todos os campos são obrigatórios!");
+        return;
+    }
+
+    let publicacao = {
+        username,
+        avatar: usuarios[usuarios.length - 1].avatar,
+        tweet
+    }
+
+    tweets.push(publicacao) 
+
+    res.status(201).send("OK")
 });
 
 app.get("/tweets", (req, res) => {
@@ -41,26 +59,12 @@ app.get("/tweets", (req, res) => {
     res.send(tweetsRecentes);
 });
 
+app.get("/tweets/:username", (req, res) => {
+    const {username} = req.params;
 
-app.post("/tweets", (req, res) => {
-    const {username, tweet} = req.body;
-    if(!tweet){
-        res.status(409).send("Campo de tweet vazio");
-        return;
-    }else if(!username){
-        res.status(409).send("Usuario não encontrado");
-        return;
-    }
+    let tweetsFiltrados = tweets.filter(t => t.username === username)
 
-    let publicacao = {
-        username,
-        avatar: usuarios[usuarios.length - 1].avatar,
-        tweet
-    }
-
-    tweets.push(publicacao) 
-
-    res.send("OK")
+    res.send(tweetsFiltrados);
 });
 
 app.listen(5000, () => console.log(`App online na porta 5000`));
