@@ -1,70 +1,68 @@
-import express from "express"
-import cors from "cors"
+import express from "express";
+import cors from "cors";
 
 const app = express();
-app.use(cors());
-app.use(express.json())
 
+app.use(cors());
+app.use(express.json());
 
 let usuarios = [];
-
 let tweets = [];
 
 app.post("/sign-up", (req, res) => {
-    const {username, avatar} = req.body
+  const { username, avatar } = req.body;
 
-    if(!username || !avatar){
-        res.status(400).send("Todos os campos são obrigatórios!");
-        return;
-    }
+  if (!username || !avatar) {
+    res.status(400).send("Todos os campos são obrigatórios!");
+    return;
+  }
 
-    let usuario = {
-        username,
-        avatar
-    }
+  let usuario = {
+    username,
+    avatar,
+  };
 
-    usuarios.push(usuario)
-    res.status(201).send("OK")
+  usuarios.push(usuario);
+  res.status(201).send("OK");
 });
 
 app.post("/tweets", (req, res) => {
-    const {username, tweet} = req.body;
-    if(!tweet || !username){
-        res.status(400).send("Todos os campos são obrigatórios!");
-        return;
-    }
+  const { username, tweet } = req.body;
 
-    let publicacao = {
-        username,
-        avatar: usuarios[usuarios.length - 1].avatar,
-        tweet
-    }
+  if (!tweet || !username) {
+    res.status(400).send("Todos os campos são obrigatórios!");
+    return;
+  }
 
-    tweets.push(publicacao) 
+  let publicacao = {
+    username,
+    avatar: usuarios[usuarios.length - 1].avatar,
+    tweet,
+  };
 
-    res.status(201).send("OK")
+  tweets.push(publicacao);
+
+  res.status(201).send("OK");
 });
 
 app.get("/tweets", (req, res) => {
+  let tweetsRecentes;
 
-    let tweetsRecentes;
+  if (tweets.length < 11) {
+    tweetsRecentes = tweets;
+  } else {
+    tweetsRecentes = tweets.slice(tweets.length - 10, tweets.length);
+  }
 
-    if(tweets.length < 11){
-        tweetsRecentes = tweets;
-    }else{
-        tweetsRecentes = tweets.slice(tweets.length-10, tweets.length);
-    }
-    
-
-    res.send(tweetsRecentes);
+  res.send(tweetsRecentes);
 });
 
 app.get("/tweets/:username", (req, res) => {
-    const {username} = req.params;
+  const { username } = req.params;
 
-    let tweetsFiltrados = tweets.filter(t => t.username === username)
+  let tweetsFiltrados = tweets.filter((t) => t.username === username);
 
-    res.send(tweetsFiltrados);
+  res.send(tweetsFiltrados);
 });
 
-app.listen(5000, () => console.log(`App online na porta 5000`));
+app.listen(5000, () => console.log("App online na porta 5000"));
